@@ -1,0 +1,117 @@
+/* Global reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Variables */
+  /* Colors */
+  --bg-clr-pimary: #15c997;
+  --bg-clr-secondary: #bcdb1a;
+  --txt-clr-pimary: black;
+  --txt-clr-secondary: #bcdb1a;
+  --bg-btn-clr: #6dfd4c;
+  --clr-pimary: #c94f5b;
+  --clr-secondary: #e57400;
+  --highlight-clr: aliceblue;
+
+  /* shadows */
+  --highlight-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7);
+}
+
+body {
+  background-color: var(--bg-clr-pimary);
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Utils */
+
+/* Header Footer */
+
+header,
+footer {
+  background-color: var(--bg-clr-secondary);
+  padding: 10px;
+}
+
+header {
+  background-color: var(--bg-clr-secondary);
+}
+header h1 {
+  margin: 1rem auto;
+}
+
+footer {
+  background-color: var(--bg-clr-secondary);
+}
+
+/* Game */
+
+.game-board {
+  border: 1px solid red;
+  min-height: 200px;
+}
+
+/* Table */
+.main table {
+  border-collapse: collapse;
+  margin: 2rem auto;
+}
+
+td {
+  border: 1px solid black;
+  width: 4rem;
+  height: 4rem;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 20px;
+}
+
+/* Cell */
+.cell {
+  min-width: 4rem;
+  min-height: 4rem;
+  background-color: var(--bg-btn-clr);
+  cursor: pointer;
+  padding: auto;
+}
+.cell {
+  min-width: 4rem;
+  min-height: 4rem;
+  background-color: var(--bg-btn-clr);
+  cursor: pointer;
+  padding: auto;
+}
+.cell:hover {
+  background-color: rgba(var(--bg-btn-clr), 0.5);
+}
+
+.not-shown {
+  background-color: gray;
+}
+
+.mine {
+  background-color: red;
+}
+
+.shown {
+  background-color: white;
+  cursor: not-allowed;
+}
+
+.marked {
+  background-color: yellow;
+}
+
+.selected {
+  background-color: var(--selected-clr);
+  box-shadow: var(--selected-shadow);
+  border: 1px solid var(--selected-clr);
+}
+
+/* Button */
