@@ -18,22 +18,67 @@
 
     <main class="main">
       <div class="options"></div>
-      <div class="stats"></div>
-      <div class="game-screen">
+      <div class="stats">
+        <div class="display mines-count">
+          <h3><span></span></h3>
+        </div>
+        <div class="emoji"></div>
+        <div class="display timer">
+          <h3><span></span></h3>
+        </div>
+        <button class="btn" onclick="onInit()">Restart</button>
+      </div>
+      <div class="game-screen" oncontextmenu="return false;">
         <div class="game-board"></div>
       </div>
       <div class="buttons-list">
-        <div class="difficulty"></div>
+        <div class="difficulty">
+          <h3>Set difficulty:</h3>
+          <button
+            class="btn btn-difficulty highlight"
+            data-size="4"
+            data-mines="2"
+            onclick="onDifficultyClick(this)"
+          >
+            Junior</button
+          ><button
+            class="btn btn-difficulty"
+            data-size="8"
+            data-mines="14"
+            onclick="onDifficultyClick(this)"
+          >
+            Mid</button
+          ><button
+            class="btn btn-difficulty"
+            data-size="12"
+            data-mines="32"
+            onclick="onDifficultyClick(this)"
+          >
+            Senior</button
+          ><button
+            class="btn btn-difficulty"
+            data-size="15"
+            data-mines="50"
+            onclick="onDifficultyClick(this)"
+          >
+            Lead
+          </button>
+        </div>
       </div>
     </main>
-
+    <div class="modal-overlay hidden" onclick="closeModal()"></div>
+    <div class="modal hidden">
+      <h2 class="modal-title">Game Over</h2>
+      <button class="btn btn-restart" onclick="onInit()">Play Again</button>
+    </div>
     <footer class="footer">
-      <p>Created by Dor Josef, CaDec24</p>
+      <p>Created by Dor Josef &copy, CaDec24</p>
     </footer>
 
     <script src="js/main.js" defer></script>
     <script src="js/cell.js" defer></script>
     <script src="js/mine.js" defer></script>
+    <script src="js/modal.js" defer></script>
     <script src="js/utils.js" defer></script>
   </body>
 </html>

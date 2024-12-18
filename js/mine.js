@@ -1,18 +1,26 @@
 'use strict'
 
-function setMines(board) {
-  if (!board.length) return null
-
+function setMines(board, isOnlyOne = false) {
+  if (!board) return null
+  // console.log(board)
   var currMinesLeft = gLevel.MINES
+  if (isOnlyOne) currMinesLeft = 1
 
   while (currMinesLeft > 0) {
-    const randIdxI = getRandomIntInclusive(0, gLevel.SIZE)
-    const randIdxJ = getRandomIntInclusive(0, gLevel.SIZE)
+    const randIdxI = parseInt(getRandomIntInclusive(0, board.length - 1))
+    const randIdxJ = parseInt(getRandomIntInclusive(0, board[0].length - 1))
+    // console.log(randIdxI, randIdxJ)
 
     var currCell = board[randIdxI][randIdxJ]
+    // console.log('currCell', currCell)
+
     if (currCell.isMine) continue
+    // console.log('currCell not mine', currCell)
 
     currCell.isMine = true
+    if (isOnlyOne) {
+      renderCell(currCell, null, randIdxI, randIdxJ)
+    }
     currMinesLeft--
   }
 }
@@ -31,7 +39,7 @@ function setMinesNegsCount(board) {
 function mineNegsCount(board = gBoard, currCell) {
   const currI = currCell.location.i
   const currJ = currCell.location.j
-  //   console.log('mineNegsCount start', 'i:', currI, 'j:', currJ, 'board', board)
+  // console.log('mineNegsCount start', 'i:', currI, 'j:', currJ, 'board', board)
 
   var mineNegsCount = 0
 
@@ -47,4 +55,20 @@ function mineNegsCount(board = gBoard, currCell) {
   //   console.log('mineNegsCount', 'i:', currI, 'j:', currJ, mineNegsCount)
 
   return mineNegsCount
+}
+
+function revealAllMines() {
+  const board = gBoard
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[0].length; j++) {
+      const currCell = board[i][j]
+      if (currCell.isMarked) continue
+      if (currCell.isMine) {
+        const elMineCell = document.querySelector(
+          `[data-i='${i}'][data-j='${j}']`
+        )
+        showCell(elMineCell, i, j)
+      }
+    }
+  }
 }

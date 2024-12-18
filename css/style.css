@@ -18,6 +18,7 @@
   --clr-pimary: #c94f5b;
   --clr-secondary: #e57400;
   --highlight-clr: aliceblue;
+  --modal-overlay-bg: rgba(0, 0, 0, 0.9);
 
   /* shadows */
   --highlight-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7);
@@ -30,13 +31,16 @@ body {
 }
 
 /* Utils */
+.hidden {
+  display: none;
+}
 
 /* Header Footer */
-
 header,
 footer {
   background-color: var(--bg-clr-secondary);
   padding: 10px;
+  width: 100%;
 }
 
 header {
@@ -54,13 +58,57 @@ footer {
 
 .game-board {
   border: 1px solid red;
-  min-height: 200px;
+  min-height: 180px;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem, auto;
+}
+
+.display {
+  min-height: 2rem;
+  border: 1px solid black;
+  margin: 1rem;
+  padding: 1rem;
+  font-size: 1.5rem;
+}
+
+.emoji {
+  padding: 1rem;
+  border: 1px solid red;
+  transition: scale 0.8s ease-in-out;
+  font-size: 2rem;
+
+  user-select: none;
+}
+.emoji:hover {
+  scale: 1.1;
+}
+
+.difficulty {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem;
+}
+.difficulty .highlight {
+  box-shadow: var(--highlight-shadow);
+  border: 2px solid white;
 }
 
 /* Table */
 .main table {
   border-collapse: collapse;
   margin: 2rem auto;
+  border-radius: 1rem;
 }
 
 td {
@@ -74,29 +122,29 @@ td {
 
 /* Cell */
 .cell {
-  min-width: 4rem;
-  min-height: 4rem;
+  min-width: 3rem;
+  min-height: 3rem;
+  font-size: 3rem;
   background-color: var(--bg-btn-clr);
   cursor: pointer;
   padding: auto;
+  transition: background-color 0.4s ease-in-out, color 0.4s ease;
+
+  user-select: none;
 }
-.cell {
-  min-width: 4rem;
-  min-height: 4rem;
-  background-color: var(--bg-btn-clr);
-  cursor: pointer;
-  padding: auto;
-}
+
 .cell:hover {
   background-color: rgba(var(--bg-btn-clr), 0.5);
 }
 
 .not-shown {
   background-color: gray;
+  color: transparent;
 }
 
 .mine {
   background-color: red;
+  /* for debugging */
 }
 
 .shown {
@@ -104,14 +152,67 @@ td {
   cursor: not-allowed;
 }
 
-.marked {
-  background-color: yellow;
+.selected {
+  opacity: 0.9;
+  border: 2px solid var(--bg-btn-clr);
 }
 
-.selected {
-  background-color: var(--selected-clr);
-  box-shadow: var(--selected-shadow);
-  border: 1px solid var(--selected-clr);
+.marked {
+  background-color: yellow;
+  /* color: white; */
 }
 
 /* Button */
+.btn {
+  padding: 1rem 2rem;
+  border: 1px solid var(--clr-secondary);
+  background-color: var(--clr-pimary);
+  color: white;
+  font-weight: 600;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: background-color 0.8s;
+}
+.btn:hover {
+  padding: 1rem 2rem;
+  border: 1px solid var(--clr-pimary);
+  background-color: var(--clr-secondary);
+  color: black;
+  font-weight: 600;
+  border-radius: 2rem;
+  cursor: pointer;
+}
+
+/* Modal */
+.modal {
+  /* use fixed to position relative to the viewport */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* center it horizontally and vertically */
+  transform: translate(-50%, -50%);
+  background-color: gray;
+  color: white;
+  width: 200px;
+  height: 200px;
+  /* above other elements */
+  z-index: 1000;
+  border-radius: 20%;
+  padding: 2rem;
+}
+.modal h2.modal-title {
+  margin: 1rem auto;
+}
+
+.modal-overlay {
+  /* all screen overlay */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 70% opacity black  */
+  background-color: var(--modal-overlay-bg);
+  /* below the modal but above everything else */
+  z-index: 999;
+}

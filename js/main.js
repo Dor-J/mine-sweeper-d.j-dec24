@@ -19,6 +19,7 @@ const gGame = {
   secsPassed: 0,
   secInterval: 0,
   elSelectedCell: null,
+  isFirstMove: false,
 }
 
 const gIcons = {
@@ -34,14 +35,21 @@ const gIcons = {
   num7: '7️⃣',
   num8: '8️⃣',
   empty: ' ',
+  happy: '😀',
+  victory: '🥳',
+  dead: '💀',
+  mark: '😉',
 }
 
 function onInit() {
+  if (gGame.isOn) stopTimer()
+
   setupGame()
   gBoard = buildBoard()
   //   console.log('gBoard after build', gBoard)
 
   renderBoard(gBoard)
+  renderStats()
 }
 
 function setupGame() {
@@ -55,34 +63,19 @@ function setupGame() {
   gGame.secsPassed = 0
   gGame.secInterval = 0
   gGame.elSelectedCell = null
+  gGame.isFirstMove = false
+
+  closeModal()
 }
 
 function buildBoard() {
-  //   console.log('buildBoard start')
-
-  // Builds the board
   const board = createEmptyBoard()
-  //   console.log('board', board)
-
-  // Set the mines
-  // TODO: setMines(board)
-  board[1][3].isMine = true
-  board[3][2].isMine = true
-  board[0][2].isMine = true
-
-  // Call setMinesNegsCount()
+  setMines(board)
   setMinesNegsCount(board)
-  //   console.log('board after mines neg count', board)
-
-  // Return the created board
   return board
 }
 
 function renderBoard(board) {
-  //   console.log('renderBoard start', 'board:', board)
-
-  // Render the board as a <table> to the page
-
   let strHTML = '<table><tbody>'
   for (let i = 0; i < board.length; i++) {
     strHTML += '<tr>'
@@ -109,7 +102,6 @@ function renderBoard(board) {
       }
 
       strHTML += `<td class="cell${classes}" data-i=${dataLocation.i} data-j=${dataLocation.j} onmousedown="onCellClicked(this, ${dataLocation.i}, ${dataLocation.j},event)">${currIcon}</td>`
-      //   console.log('strHTML', 'i:', i, 'j:', j, strHTML)
     }
     strHTML += '</tr>'
   }
@@ -120,28 +112,29 @@ function renderBoard(board) {
 }
 
 function onCellClicked(elCell, i, j, event) {
-  // first click starts the game
-  if (!gGame.isOn && gGame.minesLeft > 0) {
+  if (
+    !gGame.isOn &&
+    gGame.shownCount + gGame.markedCount !== gLevel.SIZE ** 2
+  ) {
     gGame.isOn = !gGame.isOn
     startTimer()
   }
 
   const cell = gBoard[i][j]
 
-  // ignore shown cells
-  if (!cell.isShown) return
+  if (cell.isShown) return // ignore shown cells
 
-  // Called when a cell is clicked
-  console.log('onCellClicked', elCell)
   const isLeftClick = event.button === 0
-  console.log('isLeftClick', isLeftClick)
   if (!isLeftClick) {
     onCellMarked(elCell)
+    playSound('click-right')
     return
   } else {
-    // Selecting a seat
+    playSound('click-left')
     elCell.classList.add('selected')
   }
+
+  updateEmoji('happy')
 
   // Only a single cell should be selected
   if (gGame.elSelectedCell) {
@@ -149,13 +142,11 @@ function onCellClicked(elCell, i, j, event) {
   }
   gGame.elSelectedCell = gGame.elSelectedCell !== elCell ? elCell : null
 
-  // When seat is selected a popup is shown
   if (gGame.elSelectedCell && !isLeftClick) {
     onCellMarked(elCell)
   } else if (isLeftClick) {
     if (cell.isMine) {
-      showCell(elCell, i, j)
-      gameOver()
+      cellIsMine(cell, elCell, i, j)
     } else if (cell.minesAroundCount > 0) {
       showCell(elCell, i, j)
     } else {
@@ -163,12 +154,34 @@ function onCellClicked(elCell, i, j, event) {
       expandShown(gBoard, elCell, i, j)
     }
   }
+
+  if (!gGame.isFirstMove) gGame.isFirstMove = true
+  checkGameOver()
+}
+function cellIsMine(cell, elCell, i, j) {
+  if (!gGame.isFirstMove) {
+    //set a different mine
+    setMines(gBoard, true)
+    //make cell non mine
+    cell.isMine = false
+    cell.minesAroundCount = mineNegsCount(gBoard, cell)
+    renderCell(cell, elCell, i, j)
+    gGame.isFirstMove = true
+  } else {
+    showCell(elCell, i, j)
+    elCell.innerText = gIcons.explotion
+    updateEmoji('dead')
+    playSound('losing')
+    gameOver()
+  }
 }
 function onCellMarked(elCell) {
   // Called when a cell is rightclicked See how you can hide the context menu on right click
-  const cuurI = elCell.dataset.i
-  const cuurJ = elCell.dataset.j
-  currCell = gBoard[cuurI][cuurJ]
+  // console.log('onCellMarked elCell', elCell)
+  updateEmoji('mark')
+  const cuurI = parseInt(elCell.dataset.i)
+  const cuurJ = parseInt(elCell.dataset.j)
+  var currCell = gBoard[cuurI][cuurJ]
 
   if (currCell.isMarked) {
     currCell.isMarked = false
@@ -181,37 +194,119 @@ function onCellMarked(elCell) {
 
     elCell.classList.add('marked')
   }
+  updateMinesCounter()
+  checkGameOver()
 }
 function expandShown(board, elCell, i, j) {
-  // When user clicks a cell with no
-  // mines around, we need to open
-  // not only that cell, but also its
-  // neighbors.
-  // NOTE: start with a basic
-  // implementation that only opens
-  // the non-mine 1st degree
-  // neighbors
-  // BONUS: if you have the time
-  // later, try to work more like the
-  // real algorithm (see description
-  // at the Bonuses section below)
+  const cell = board[i][j]
+  if (cell.isShown || cell.isMarked) return
+
+  // reveal the current cell
+  showCell(elCell, i, j)
+
+  // Stop recursion if the cell has mines around it
+  if (cell.minesAroundCount > 0) return
+
+  // iterate over negs to reveal recursively
+  for (let rowIdx = i - 1; rowIdx <= i + 1; rowIdx++) {
+    if (rowIdx < 0 || rowIdx >= board.length) continue
+
+    for (let colIdx = j - 1; colIdx <= j + 1; colIdx++) {
+      if (colIdx < 0 || colIdx >= board[0].length) continue
+      if (rowIdx === i && colIdx === j) continue
+
+      const negCell = board[rowIdx][colIdx]
+      const elnegCell = document.querySelector(
+        `.cell[data-i='${rowIdx}'][data-j='${colIdx}']`
+      )
+
+      expandShown(board, elnegCell, rowIdx, colIdx) // recursive
+    }
+  }
 }
 
 function checkGameOver() {
   // Game ends when all mines are marked, and all the other cells are shown
-  if (gGame.minesLeft === 0) {
+  if (
+    gGame.markedCount === gLevel.MINES &&
+    gGame.shownCount + gGame.markedCount === gLevel.SIZE ** 2
+  ) {
     gGame.isOn = false
     stopTimer()
-    //TODO:finish
+    updateEmoji('victory')
+    playSound('victory')
+    renderVictoryModal()
+    setTimeout(closeModal, 6000)
   }
 }
 
 function gameOver() {
   stopTimer()
-  //reveal all board
-  revealAllBoard()
+  //reveal all mines
+  revealAllMines()
+  renderLoseModal()
+  setTimeout(closeModal, 6000)
 }
 
-function revealAllBoard() {
-  const board = gBoard
+function renderStats() {
+  const elMinesCounter = document.querySelector('.mines-count h3 span')
+  elMinesCounter.innerText = gLevel.MINES - gGame.markedCount
+  const elTimer = document.querySelector('.timer h3 span')
+  elTimer.innerText = '00 : 00'
+  const elemoji = document.querySelector('.stats .emoji')
+  elemoji.innerText = gIcons.happy
+}
+
+function updateTimer() {
+  const elTimer = document.querySelector('.timer h3 span')
+  elTimer.innerText = getTime()
+}
+
+function updateMinesCounter() {
+  const elMinesCounter = document.querySelector('.mines-count h3 span')
+  elMinesCounter.innerText = gLevel.MINES - gGame.markedCount
+}
+
+function updateEmoji(mood = 'happy') {
+  const elEmojiSpan = document.querySelector('.stats .emoji ')
+  // console.log(elEmojiSpan)
+  var icon = ''
+  if (!mood) retuen
+  switch (mood) {
+    case 'mark':
+      icon = gIcons.mark
+      break
+    case 'victory':
+      icon = gIcons.victory
+      break
+    case 'dead':
+      icon = gIcons.dead
+      break
+    case 'happy':
+      icon = gIcons.happy
+      break
+  }
+  elEmojiSpan.innerText = icon
+}
+
+function onDifficultyClick(elDifBtn) {
+  const size = parseInt(elDifBtn.dataset.size)
+  const minesCount = parseInt(elDifBtn.dataset.mines)
+
+  gameOver()
+  highlightDifficultyBtn(elDifBtn)
+
+  gLevel.SIZE = size
+  gLevel.MINES = minesCount
+
+  onInit()
+}
+
+function highlightDifficultyBtn(newDifBtn) {
+  const currDifBtn = document.querySelector('.difficulty .highlight')
+  console.log('currDifBtn', currDifBtn)
+  currDifBtn.classList.remove('highlight')
+  console.log('currDifBtn', currDifBtn)
+  newDifBtn.classList.add('highlight')
+  console.log('newDifBtn', newDifBtn)
 }

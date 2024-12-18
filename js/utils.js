@@ -15,15 +15,17 @@ function createEmptyBoard() {
 
 // TIMER
 function startTimer() {
+  console.log('startTimer active')
+
   gGame.secInterval = setInterval(countTime, 1000)
 }
 function countTime() {
   gGame.secsPassed++
   // console.log('countTime', gGame.secsPassed)
-  //TODO: update element with the get time function
+  updateTimer()
 }
 function stopTimer() {
-  clearInterval(secInterval)
+  clearInterval(gGame.secInterval)
 }
 function getTime() {
   const currSeconds = gGame.secsPassed

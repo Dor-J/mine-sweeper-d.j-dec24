@@ -14,49 +14,42 @@ function createCell(i, j) {
 }
 
 function showCell(elCell, i, j) {
+  const cell = gBoard[i][j]
+  if (cell.isShown) return
+
   elCell.classList.remove('not-shown')
   elCell.classList.add('shown')
 
-  const cell = gBoard[i][j]
   cell.isShown = true
   gGame.shownCount++
 }
 
-// function renderCell(currCell) {
-//   const currI = currCell.location.i
-//   const currJ = currCell.location.j
-//   var strHTML = ''
-//   var currIcon = gIcons.empty
-//   var classes = ''
-//   if (cell.isMine && !cell.isMarked) {
-//     classes += ' mine'
-//     currIcon = gIcons.mine
-//   } else if (cell.minesAroundCount > 0) {
-//     currIcon = gIcons[`num${cell.minesAroundCount}`]
-//   }
-//   if (!cell.isShown) {
-//     classes += ' not-shown'
-//   } else {
-//     classes += ' shown'
-//   }
-//   if (cell.isMarked) {
-//     classes += ' marked'
-//     currIcon = gIcons.flag
-//   }
+function renderCell(currCell, currElCell, i, j) {
+  var strHTML = ''
+  var currIcon = gIcons.empty
+  var classes = ''
 
-//   strHTML += `<td class="cell${classes}" data-i=${currI} data-j=${currJ} onmousedown="onCellClicked(this, ${currI}, ${currJ},event)">${currIcon}</td>`
+  if (!currCell) currCell = gBoard[i][j]
+  if (currCell.isMine && !currCell.isMarked) {
+    classes += ' mine'
+    currIcon = gIcons.mine
+  } else if (currCell.minesAroundCount > 0) {
+    currIcon = gIcons[`num${currCell.minesAroundCount}`]
+  }
+  if (!currCell.isShown) {
+    classes += ' not-shown'
+  } else {
+    classes += ' shown'
+  }
+  if (currCell.isMarked) {
+    classes += ' marked'
+    currIcon = gIcons.flag
+  }
 
-//   //update model
-//   gBoard[currI][currJ] = currCell
+  strHTML += `<td class="cell${classes}" data-i=${i} data-j=${j} onmousedown="onCellClicked(this, ${i}, ${j},event)">${currIcon}</td>`
 
-//   //update dom
-//   const elCell = document.querySelector(
-//     `.cell [data-i=${currI}][data-j=${currJ}]`
-//   )
-//   if (!elCell) {
-//     console.error(`Cell not found for i:${currI}, j:${currJ}`)
-//     return
-//   }
-
-//   elCell.innerHTML = strHTML
-// }
+  if (!currElCell) {
+    currElCell = document.querySelector(`.cell[data-i='${i}'][data-j='${j}']`)
+  }
+  currElCell.innerHTML = strHTML
+}
