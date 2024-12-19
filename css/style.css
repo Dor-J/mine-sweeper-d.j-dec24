@@ -10,24 +10,40 @@
 :root {
   /* Variables */
   /* Colors */
-  --bg-clr-pimary: #15c997;
-  --bg-clr-secondary: #bcdb1a;
-  --txt-clr-pimary: black;
-  --txt-clr-secondary: #bcdb1a;
-  --bg-btn-clr: #6dfd4c;
-  --clr-pimary: #c94f5b;
+  --color-bg-primary: #15c997;
+  --color-bg-secondary: #bcdb1a;
+  --color-txt-primary: #000000;
+  --color-txt-secondary: #bcdb1a;
+  --color-btn-bg: #6dfd4c;
+  --color-btn-txt: #000000;
   --clr-secondary: #e57400;
-  --highlight-clr: aliceblue;
-  --modal-overlay-bg: rgba(0, 0, 0, 0.9);
+  --btn-clr-pimary: #c94f5b;
+  --color-highlight: aliceblue;
+  --color-overlay: rgba(0, 0, 0, 0.9);
+  --color-cell-bg: gray;
+  --color-cell-hover: #bdbaba;
+  --color-cell-revealed: #ffffff;
+  --color-cell-flagged: yellow;
+  --color-cell-flagged-txt: white;
 
   /* shadows */
   --highlight-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7);
+
+  /* sizes  */
+  --cell-size: 4rem;
+  --modal-width: 250px;
+  --modal-height: 250px;
+
+  /* border radius */
+  --modal-border-radius: 20%;
 }
 
 body {
-  background-color: var(--bg-clr-pimary);
+  background-color: var(--color-bg-primary);
   text-align: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 /* Utils */
@@ -35,29 +51,46 @@ body {
   display: none;
 }
 
+.pointer {
+  cursor: pointer;
+}
+
+.pointer-no {
+  cursor: not-allowed;
+}
+
+.highlight {
+  box-shadow: var(--highlight-shadow);
+  border: 2px solid white;
+}
+
 /* Header Footer */
 header,
 footer {
-  background-color: var(--bg-clr-secondary);
+  background-color: var(--color-bg-secondary);
   padding: 10px;
   width: 100%;
 }
 
-header {
-  background-color: var(--bg-clr-secondary);
-}
 header h1 {
   margin: 1rem auto;
 }
 
 footer {
-  background-color: var(--bg-clr-secondary);
+  text-align: center;
+  line-height: 2rem;
+  height: 3rem;
 }
 
 /* Game */
 
 .game-board {
   min-height: 180px;
+}
+
+.game-over {
+  pointer-events: none;
+  cursor: not-allowed;
 }
 
 /* Stats */
@@ -82,7 +115,7 @@ footer {
   padding: 1rem;
   /* border: 1px solid red; */
   transition: scale 0.8s ease-in-out;
-  font-size: 2rem;
+  font-size: 2.5rem;
 
   user-select: none;
 }
@@ -94,7 +127,6 @@ footer {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
-  min-height: auto;
 }
 
 .difficulty {
@@ -104,10 +136,6 @@ footer {
   justify-content: center;
   align-items: center;
   margin: 0.5rem;
-}
-.highlight {
-  box-shadow: var(--highlight-shadow);
-  border: 2px solid white;
 }
 
 .hints h3 span {
@@ -125,33 +153,32 @@ footer {
 }
 
 td {
-  border: 1px solid #333;
   width: 4rem;
   height: 4rem;
   text-align: center;
   vertical-align: middle;
   font-size: 20px;
+  border: 1px solid #333;
 }
 
 /* Cell */
 .cell {
-  min-width: 3rem;
-  min-height: 3rem;
+  min-width: var(--cell-size);
+  min-height: var(--cell-size);
   font-size: 3rem;
-  background-color: var(--bg-btn-clr);
+  background-color: var(--color-cell-bg);
   cursor: pointer;
   padding: auto;
-  transition: background-color 0.4s ease-in-out, color 0.4s ease;
+  transition: background-color 0.4s ease-in, color 0.4s ease;
 
   user-select: none;
 }
 
 .cell:hover {
-  background-color: rgba(var(--bg-btn-clr), 0.5);
+  background-color: rgb(189, 186, 186);
 }
 
 .not-shown {
-  background-color: gray;
   color: transparent;
 }
 
@@ -180,8 +207,8 @@ td {
 .btn {
   padding: 1rem 2rem;
   border: 1px solid var(--clr-secondary);
-  background-color: var(--clr-pimary);
-  color: white;
+  background-color: var(--btn-clr-pimary);
+  color: black;
   font-weight: 600;
   border-radius: 2rem;
   cursor: pointer;
@@ -189,21 +216,12 @@ td {
 }
 .btn:hover {
   padding: 1rem 2rem;
-  border: 1px solid var(--clr-pimary);
+  border: 1px solid var(--btn-clr-pimary);
   background-color: var(--clr-secondary);
   color: black;
   font-weight: 600;
   border-radius: 2rem;
   cursor: pointer;
-}
-.btn.btn-restart {
-  margin: 0.6rem auto;
-  padding: 0.7rem 1.5rem 1rem;
-}
-
-.btn.btn-restart span,
-.btn.btn-undo span {
-  font-size: 1.2rem;
 }
 
 /* Modal */
@@ -214,16 +232,19 @@ td {
   left: 50%;
   /* center it horizontally and vertically */
   transform: translate(-50%, -50%);
-  background-color: gray;
-  color: white;
-  width: 200px;
-  height: 200px;
+  background-color: var(--color-cell-bg);
+  color: var(--color-cell-flagged-txt);
+  min-width: var(--modal-width) x;
+  min-height: var(--modal-height);
   /* above other elements */
   z-index: 1000;
-  border-radius: 20%;
+  border-radius: var(--modal-border-radius);
   padding: 2rem;
 }
 .modal h2.modal-title {
+  margin: 1rem auto;
+}
+.modal p {
   margin: 1rem auto;
 }
 
@@ -235,7 +256,15 @@ td {
   width: 100%;
   height: 100%;
   /* 70% opacity black  */
-  background-color: var(--modal-overlay-bg);
+  background-color: var(--modal-overlay);
   /* below the modal but above everything else */
   z-index: 999;
+}
+
+/* Scorboard */
+.scoreboard {
+  position: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 2rem 3rem;
 }

@@ -4,9 +4,9 @@
 
 function createEmptyBoard() {
   const board = []
-  for (let i = 0; i < gLevel.SIZE; i++) {
+  for (var i = 0; i < gLevel.SIZE; i++) {
     board.push([])
-    for (let j = 0; j < gLevel.SIZE; j++) {
+    for (var j = 0; j < gLevel.SIZE; j++) {
       board[i][j] = createCell(i, j)
     }
   }
@@ -15,13 +15,10 @@ function createEmptyBoard() {
 
 // TIMER
 function startTimer() {
-  console.log('startTimer active')
-
   gGame.secInterval = setInterval(countTime, 1000)
 }
 function countTime() {
   gGame.secsPassed++
-  // console.log('countTime', gGame.secsPassed)
   updateTimer()
 }
 function stopTimer() {
@@ -41,7 +38,7 @@ function getTime() {
     seconds = '0' + seconds.toString()
   }
 
-  return `${minutes} : ${seconds}` //TODO: format to minutes:seconds
+  return `${minutes} : ${seconds}`
 }
 
 // GENERAL
@@ -51,9 +48,9 @@ function getRandomIntInclusive(min, max) {
 
 function getRandomColor() {
   const letters = '0123456789ABCDEF'
-  let color = '#'
+  var color = '#'
 
-  for (let i = 0; i < 6; i++) {
+  for (var i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * letters.length)]
   }
   return color

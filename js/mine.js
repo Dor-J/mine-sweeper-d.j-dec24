@@ -2,20 +2,16 @@
 
 function setMines(board, isOnlyOne = false) {
   if (!board) return null
-  // console.log(board)
   var currMinesLeft = gLevel.MINES
   if (isOnlyOne) currMinesLeft = 1
 
   while (currMinesLeft > 0) {
     const randIdxI = parseInt(getRandomIntInclusive(0, board.length - 1))
     const randIdxJ = parseInt(getRandomIntInclusive(0, board[0].length - 1))
-    // console.log(randIdxI, randIdxJ)
 
     var currCell = board[randIdxI][randIdxJ]
-    // console.log('currCell', currCell)
 
     if (currCell.isMine) continue
-    // console.log('currCell not mine', currCell)
 
     currCell.isMine = true
     if (isOnlyOne) {
@@ -39,7 +35,6 @@ function setMinesNegsCount(board) {
 function mineNegsCount(board = gBoard, currCell) {
   const currI = currCell.location.i
   const currJ = currCell.location.j
-  // console.log('mineNegsCount start', 'i:', currI, 'j:', currJ, 'board', board)
 
   var mineNegsCount = 0
 
@@ -52,7 +47,6 @@ function mineNegsCount(board = gBoard, currCell) {
       if (currInnerCell.isMine) mineNegsCount++
     }
   }
-  //   console.log('mineNegsCount', 'i:', currI, 'j:', currJ, mineNegsCount)
 
   return mineNegsCount
 }

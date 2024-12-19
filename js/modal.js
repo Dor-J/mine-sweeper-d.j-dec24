@@ -14,6 +14,10 @@ function openModal() {
 function closeModal() {
   document.querySelector('.modal').classList.add('hidden')
   document.querySelector('.modal-overlay').classList.add('hidden')
+
+  document.querySelector('.modal .scoreboard .ol-junior').innerHTML = ''
+  document.querySelector('.modal .scoreboard .ol-mid').innerHTML = ''
+  document.querySelector('.modal .scoreboard .ol-senior').innerHTML = ''
 }
 
 function renderLoseModal() {

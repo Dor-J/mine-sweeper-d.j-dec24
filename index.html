@@ -36,6 +36,7 @@
       <div class="game-screen" oncontextmenu="return false;">
         <div class="game-board"></div>
       </div>
+
       <div class="buttons-list">
         <div class="difficulty">
           <h3>Set difficulty:</h3>
@@ -62,18 +63,19 @@
             Senior
           </button>
         </div>
-        <button class="btn btn-restart" onclick="onInit()">
-          Restart <span>🔁</span>
+
+        <button class="btn btn-restart" onclick="onInit()">Restart</button>
+        <button class="btn btn-mega-hint" onclick="onMegaHintClick()">
+          Mega Hint
         </button>
-        <button class="btn btn-undo" onclick="onUndoClick()">
-          Undo <span>↩️</span>
+
+        <button class="btn btn-scoreboard" onclick="onOpenScoreBoard()">
+          Scoreboard
         </button>
         <div class="display hints">
           <h3>Hints left:</h3>
           <h3><span onclick="onHintClick()">0</span></h3>
         </div>
-        </div>
-      </div>
       </div>
     </main>
 
@@ -84,7 +86,18 @@
     ></div>
     <div class="modal hidden">
       <h2 class="modal-title">Game Over</h2>
+
+      <div class="scoreboard hidden">
+        <h4>Junior Scores:</h4>
+        <div class="ol-junior"></div>
+        <h4>Mid Scores:</h4>
+        <div class="ol-mid"></div>
+        <h4>Senior Scores:</h4>
+        <div class="ol-senior"></div>
+      </div>
+
       <button class="btn btn-restart" onclick="onInit()">Play Again</button>
+      <p>Press anywhere to close.</p>
     </div>
 
     <footer class="footer">
@@ -94,6 +107,9 @@
     <script src="js/main.js" defer></script>
     <script src="js/cell.js" defer></script>
     <script src="js/mine.js" defer></script>
+    <script src="js/hints.js" defer></script>
+    <script src="js/stats.js" defer></script>
+    <script src="js/score.js" defer></script>
     <script src="js/modal.js" defer></script>
     <script src="js/utils.js" defer></script>
   </body>
