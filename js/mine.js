@@ -27,8 +27,8 @@ function setMines(board, isOnlyOne = false) {
 
 function setMinesNegsCount(board) {
   // Count mines around each cell and set the cell's minesAroundCount.
-  for (let i = 0; i < gLevel.SIZE; i++) {
-    for (let j = 0; j < gLevel.SIZE; j++) {
+  for (var i = 0; i < gLevel.SIZE; i++) {
+    for (var j = 0; j < gLevel.SIZE; j++) {
       var currCell = board[i][j]
       if (!currCell.isMine)
         currCell.minesAroundCount = mineNegsCount(board, currCell)
@@ -59,8 +59,8 @@ function mineNegsCount(board = gBoard, currCell) {
 
 function revealAllMines() {
   const board = gBoard
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[0].length; j++) {
+  for (var i = 0; i < board.length; i++) {
+    for (var j = 0; j < board[0].length; j++) {
       const currCell = board[i][j]
       if (currCell.isMarked) continue
       if (currCell.isMine) {

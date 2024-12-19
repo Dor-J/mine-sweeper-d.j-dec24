@@ -20,12 +20,15 @@ const gGame = {
   secInterval: 0,
   elSelectedCell: null,
   isFirstMove: false,
+  livesCount: 0,
+  hintsCount: 0,
+  isHintOn: false,
 }
 
 const gIcons = {
-  mine: '💣',
+  mine: '💣', //🕷👾👽
   explotion: '💥',
-  flag: '📎',
+  flag: '🚩', //📎
   num1: '1️⃣',
   num2: '2️⃣',
   num3: '3️⃣',
@@ -39,6 +42,8 @@ const gIcons = {
   victory: '🥳',
   dead: '💀',
   mark: '😉',
+  life: '🧡', //💻
+  hint: '💡',
 }
 
 function onInit() {
@@ -50,6 +55,7 @@ function onInit() {
 
   renderBoard(gBoard)
   renderStats()
+  updateHintsCounter()
 }
 
 function setupGame() {
@@ -64,6 +70,9 @@ function setupGame() {
   gGame.secInterval = 0
   gGame.elSelectedCell = null
   gGame.isFirstMove = false
+  gGame.livesCount = 3
+  gGame.hintsCount = 3
+  gGame.isHintOn = false
 
   closeModal()
 }
@@ -76,10 +85,10 @@ function buildBoard() {
 }
 
 function renderBoard(board) {
-  let strHTML = '<table><tbody>'
-  for (let i = 0; i < board.length; i++) {
+  var strHTML = '<table><tbody>'
+  for (var i = 0; i < board.length; i++) {
     strHTML += '<tr>'
-    for (let j = 0; j < board[0].length; j++) {
+    for (var j = 0; j < board[0].length; j++) {
       const cell = board[i][j]
       const dataLocation = { i, j }
       var currIcon = gIcons.empty
@@ -124,12 +133,18 @@ function onCellClicked(elCell, i, j, event) {
 
   if (cell.isShown) return // ignore shown cells
 
+  if (gGame.isHintOn) {
+    showHintClick(cell)
+    return
+  }
+
   const isLeftClick = event.button === 0
   if (!isLeftClick) {
     onCellMarked(elCell)
     playSound('click-right')
     return
   } else {
+    if (cell.isMarked) return //if marked only unmark is allowed
     playSound('click-left')
     elCell.classList.add('selected')
   }
@@ -158,26 +173,38 @@ function onCellClicked(elCell, i, j, event) {
   if (!gGame.isFirstMove) gGame.isFirstMove = true
   checkGameOver()
 }
+
 function cellIsMine(cell, elCell, i, j) {
   if (!gGame.isFirstMove) {
     //set a different mine
     setMines(gBoard, true)
+
     //make cell non mine
     cell.isMine = false
-    cell.minesAroundCount = mineNegsCount(gBoard, cell)
-    renderCell(cell, elCell, i, j)
+    cell.isShown = true
+
+    //update NegsCount for all cells because mine was moved
+    setMinesNegsCount(gBoard)
+    renderBoard(gBoard)
+
     gGame.isFirstMove = true
+    showCell(elCell, i, j)
   } else {
     showCell(elCell, i, j)
     elCell.innerText = gIcons.explotion
-    updateEmoji('dead')
-    playSound('losing')
-    gameOver()
+    gGame.livesCount--
+    updateLIfeCounter()
+
+    if (gGame.livesCount <= 0) {
+      updateEmoji('dead')
+      playSound('losing')
+      gameOver()
+    }
   }
 }
+
 function onCellMarked(elCell) {
-  // Called when a cell is rightclicked See how you can hide the context menu on right click
-  // console.log('onCellMarked elCell', elCell)
+  // called when a cell is rightclicked
   updateEmoji('mark')
   const cuurI = parseInt(elCell.dataset.i)
   const cuurJ = parseInt(elCell.dataset.j)
@@ -188,15 +215,21 @@ function onCellMarked(elCell) {
     gGame.markedCount--
 
     elCell.classList.remove('marked')
+    elCell.innerText = currCell.prevCellIcon
+    currCell.prevCellIcon = null
   } else {
     currCell.isMarked = true
     gGame.markedCount++
 
+    currCell.prevCellIcon = elCell.innerText
+
     elCell.classList.add('marked')
+    elCell.innerText = gIcons.flag
   }
   updateMinesCounter()
   checkGameOver()
 }
+
 function expandShown(board, elCell, i, j) {
   const cell = board[i][j]
   if (cell.isShown || cell.isMarked) return
@@ -208,10 +241,10 @@ function expandShown(board, elCell, i, j) {
   if (cell.minesAroundCount > 0) return
 
   // iterate over negs to reveal recursively
-  for (let rowIdx = i - 1; rowIdx <= i + 1; rowIdx++) {
+  for (var rowIdx = i - 1; rowIdx <= i + 1; rowIdx++) {
     if (rowIdx < 0 || rowIdx >= board.length) continue
 
-    for (let colIdx = j - 1; colIdx <= j + 1; colIdx++) {
+    for (var colIdx = j - 1; colIdx <= j + 1; colIdx++) {
       if (colIdx < 0 || colIdx >= board[0].length) continue
       if (rowIdx === i && colIdx === j) continue
 
@@ -253,13 +286,24 @@ function renderStats() {
   elMinesCounter.innerText = gLevel.MINES - gGame.markedCount
   const elTimer = document.querySelector('.timer h3 span')
   elTimer.innerText = '00 : 00'
-  const elemoji = document.querySelector('.stats .emoji')
-  elemoji.innerText = gIcons.happy
+  const elEmoji = document.querySelector('.stats .emoji')
+  elEmoji.innerText = gIcons.happy
+  const elLifeCounter = document.querySelector('.stats .lives h3 span')
+  elLifeCounter.innerText = `${gIcons.life} ${gIcons.life} ${gIcons.life}`
 }
 
 function updateTimer() {
   const elTimer = document.querySelector('.timer h3 span')
   elTimer.innerText = getTime()
+}
+
+function updateLIfeCounter() {
+  const elLifeCounter = document.querySelector('.stats .lives h3 span')
+  var lifeCounter = ''
+  for (var i = 0; i < gGame.livesCount; i++) {
+    lifeCounter += gIcons.life + ' '
+  }
+  elLifeCounter.innerText = lifeCounter
 }
 
 function updateMinesCounter() {
@@ -269,7 +313,7 @@ function updateMinesCounter() {
 
 function updateEmoji(mood = 'happy') {
   const elEmojiSpan = document.querySelector('.stats .emoji ')
-  // console.log(elEmojiSpan)
+
   var icon = ''
   if (!mood) retuen
   switch (mood) {
@@ -286,6 +330,7 @@ function updateEmoji(mood = 'happy') {
       icon = gIcons.happy
       break
   }
+
   elEmojiSpan.innerText = icon
 }
 
@@ -304,9 +349,61 @@ function onDifficultyClick(elDifBtn) {
 
 function highlightDifficultyBtn(newDifBtn) {
   const currDifBtn = document.querySelector('.difficulty .highlight')
-  console.log('currDifBtn', currDifBtn)
   currDifBtn.classList.remove('highlight')
-  console.log('currDifBtn', currDifBtn)
+
   newDifBtn.classList.add('highlight')
-  console.log('newDifBtn', newDifBtn)
+}
+
+function onUndoClick() {
+  // TODO:
+}
+
+/******************** Hint *********************/
+function onHintClick() {
+  gGame.isHintOn = !gGame.isHintOn
+  const elHintCounter = document.querySelector('.hints h3 span')
+  elHintCounter.classList.toggle('highlight')
+}
+
+function updateHintsCounter() {
+  const elHintCounter = document.querySelector('.hints h3 span')
+  var hintCounter = ''
+  for (var i = 0; i < gGame.livesCount; i++) {
+    hintCounter += gIcons.hint + ' '
+  }
+
+  elHintCounter.classList.remove('highlight')
+  elHintCounter.innerText = hintCounter
+}
+
+function showHintClick(currCell) {
+  if (!gGame.isHintOn) return //if on than exit
+
+  const cuurI = parseInt(elCell.dataset.i)
+  const cuurJ = parseInt(elCell.dataset.j)
+
+  for (var i = currI - 1; i <= currI + 1; i++) {
+    if (i < 0 || i >= gBoard.length) continue
+    for (var j = currJ - 1; j <= currJ + 1; j++) {
+      if (j < 0 || j >= gBoard[0].length) continue
+      const elCell = document.querySelector(
+        `.cell[data-i='${rowIdx}'][data-j='${colIdx}']`
+      )
+      hintReveal(elCell)
+    }
+  }
+
+  updateHintsCounter()
+  gGame.isHintOn = !gGame.isHintOn //turn off
+}
+
+function hintReveal(elCell) {
+  elCell.classList.remove('not-shown')
+  elCell.classList.add('shown')
+  setTimeout(hintClose, 3000, elCell)
+}
+
+function hintClose(elCell) {
+  elCell.classList.add('not-shown')
+  elCell.classList.remove('shown')
 }

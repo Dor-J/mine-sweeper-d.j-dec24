@@ -57,7 +57,6 @@ footer {
 /* Game */
 
 .game-board {
-  border: 1px solid red;
   min-height: 180px;
 }
 
@@ -65,7 +64,7 @@ footer {
 .stats {
   display: flex;
   flex-direction: row;
-  gap: 2rem;
+  gap: 1.8rem;
   justify-content: center;
   align-items: center;
   margin: 1rem, auto;
@@ -73,15 +72,15 @@ footer {
 
 .display {
   min-height: 2rem;
-  border: 1px solid black;
-  margin: 1rem;
+  /* border: 1px solid black; */
+  margin: 1rem 0.5rem;
   padding: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 
 .emoji {
   padding: 1rem;
-  border: 1px solid red;
+  /* border: 1px solid red; */
   transition: scale 0.8s ease-in-out;
   font-size: 2rem;
 
@@ -89,6 +88,13 @@ footer {
 }
 .emoji:hover {
   scale: 1.1;
+}
+
+.lives {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-height: auto;
 }
 
 .difficulty {
@@ -99,20 +105,27 @@ footer {
   align-items: center;
   margin: 0.5rem;
 }
-.difficulty .highlight {
+.highlight {
   box-shadow: var(--highlight-shadow);
   border: 2px solid white;
+}
+
+.hints h3 span {
+  border-radius: 2rem;
+  cursor: pointer;
+  padding: 0.2rem 0.8rem;
+  margin-block-start: 0.5rem;
 }
 
 /* Table */
 .main table {
   border-collapse: collapse;
-  margin: 2rem auto;
+  margin: 1rem auto 1.4rem;
   border-radius: 1rem;
 }
 
 td {
-  border: 1px solid black;
+  border: 1px solid #333;
   width: 4rem;
   height: 4rem;
   text-align: center;
@@ -142,10 +155,11 @@ td {
   color: transparent;
 }
 
+/* for debugging 
 .mine {
   background-color: red;
-  /* for debugging */
-}
+} 
+*/
 
 .shown {
   background-color: white;
@@ -159,7 +173,7 @@ td {
 
 .marked {
   background-color: yellow;
-  /* color: white; */
+  color: white;
 }
 
 /* Button */
@@ -181,6 +195,15 @@ td {
   font-weight: 600;
   border-radius: 2rem;
   cursor: pointer;
+}
+.btn.btn-restart {
+  margin: 0.6rem auto;
+  padding: 0.7rem 1.5rem 1rem;
+}
+
+.btn.btn-restart span,
+.btn.btn-undo span {
+  font-size: 1.2rem;
 }
 
 /* Modal */

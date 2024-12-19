@@ -17,17 +17,22 @@
     </header>
 
     <main class="main">
-      <div class="options"></div>
       <div class="stats">
         <div class="display mines-count">
+          <h3>Mines left:</h3>
           <h3><span></span></h3>
         </div>
         <div class="emoji"></div>
         <div class="display timer">
+          <h3>Timer:</h3>
           <h3><span></span></h3>
         </div>
-        <button class="btn" onclick="onInit()">Restart</button>
+        <div class="display lives">
+          <h3>Lives left:</h3>
+          <h3><span>0</span></h3>
+        </div>
       </div>
+
       <div class="game-screen" oncontextmenu="return false;">
         <div class="game-board"></div>
       </div>
@@ -54,23 +59,34 @@
             data-mines="32"
             onclick="onDifficultyClick(this)"
           >
-            Senior</button
-          ><button
-            class="btn btn-difficulty"
-            data-size="15"
-            data-mines="50"
-            onclick="onDifficultyClick(this)"
-          >
-            Lead
+            Senior
           </button>
         </div>
+        <button class="btn btn-restart" onclick="onInit()">
+          Restart <span>🔁</span>
+        </button>
+        <button class="btn btn-undo" onclick="onUndoClick()">
+          Undo <span>↩️</span>
+        </button>
+        <div class="display hints">
+          <h3>Hints left:</h3>
+          <h3><span onclick="onHintClick()">0</span></h3>
+        </div>
+        </div>
+      </div>
       </div>
     </main>
-    <div class="modal-overlay hidden" onclick="closeModal()"></div>
+
+    <div
+      class="modal-overlay hidden"
+      onclick="closeModal()"
+      oncontextmenu="return false;"
+    ></div>
     <div class="modal hidden">
       <h2 class="modal-title">Game Over</h2>
       <button class="btn btn-restart" onclick="onInit()">Play Again</button>
     </div>
+
     <footer class="footer">
       <p>Created by Dor Josef &copy, CaDec24</p>
     </footer>
