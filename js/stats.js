@@ -1,14 +1,20 @@
 'use strict'
 
 function renderStats() {
-  const elMinesCounter = document.querySelector('.mines-count h3 span')
-  elMinesCounter.innerText = gLevel.MINES - gGame.markedCount
+  const elMinesCounter = document.querySelector('.display.mines-count h3 span')
+  elMinesCounter.innerText = getMinesLeft()
+
   const elTimer = document.querySelector('.timer h3 span')
   elTimer.innerText = '00 : 00'
+
   const elEmoji = document.querySelector('.stats .emoji')
   elEmoji.innerText = gIcons.happy
+
   const elLifeCounter = document.querySelector('.stats .lives h3 span')
   elLifeCounter.innerText = `${gIcons.life} ${gIcons.life} ${gIcons.life}`
+
+  const elSafeClickCounter = document.querySelector('.safe-click-counter')
+  elSafeClickCounter.innerText = gGame.safeClicks
 }
 
 function updateTimer() {
@@ -26,8 +32,8 @@ function updateLIfeCounter() {
 }
 
 function updateMinesCounter() {
-  const elMinesCounter = document.querySelector('.mines-count h3 span')
-  elMinesCounter.innerText = gLevel.MINES - gGame.markedCount
+  const elMinesCounter = document.querySelector('.display.mines-count h3 span')
+  elMinesCounter.innerText = getMinesLeft()
 }
 
 function updateEmoji(mood = 'happy') {
@@ -51,7 +57,15 @@ function updateEmoji(mood = 'happy') {
     case 'hint':
       icon = gIcons.hintFace
       break
+    case 'exterminate':
+      icon = gIcons.exterminate
+      break
   }
 
   elEmojiSpan.innerText = icon
+}
+
+function updateSafeClickCounter() {
+  const elSafeClickCounter = document.querySelector('.safe-click-counter')
+  elSafeClickCounter.innerText = gGame.safeClicks
 }

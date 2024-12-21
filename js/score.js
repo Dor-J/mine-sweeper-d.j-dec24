@@ -105,13 +105,14 @@ function setScore() {
 
   score.date = `${day}-${month}-${year} ${hour}:${minutes}`
 
-  score.storageKey = currDate.getTime() + score.scoreInSecs
+  score.storageKey = (currDate.getTime() + score.scoreInSecs).toString()
 
   return score
 }
 
 function addScore() {
   const score = setScore()
+  // the | is the seperator
   const scoreString = `${score.storageKey}|${score.category}|${score.score}|${score.scoreInSecs}|${score.date}`
   localStorage.setItem(score.storageKey, scoreString)
   gScores.push(score)

@@ -66,3 +66,77 @@ function revealAllMines() {
     }
   }
 }
+
+function countMarkedMines() {
+  var correctlyMarkedMines = 0
+  for (var i = 0; i < gBoard.length; i++) {
+    for (var j = 0; j < gBoard[i].length; j++) {
+      const cell = gBoard[i][j]
+      if (cell.isMarked && cell.isMine && !cell.isShown) {
+        correctlyMarkedMines++
+      }
+    }
+  }
+  return correctlyMarkedMines
+}
+
+function countShownMines() {
+  var shownMines = 0
+  for (var i = 0; i < gBoard.length; i++) {
+    for (var j = 0; j < gBoard[0].length; j++) {
+      const cell = gBoard[i][j]
+      // If it's a mine and it is shown and not marked
+      if (cell.isMine && cell.isShown && !cell.isMarked) shownMines++
+    }
+  }
+  return shownMines
+}
+
+function getMinesLeft() {
+  const flaggedMines = countMarkedMines()
+  const revealedMines = countShownMines()
+  const exterminatedMines = countExterminatedMines()
+
+  // subtract accounted (flagged + revealed) from total
+  const minesLeft =
+    gLevel.MINES - (flaggedMines + revealedMines + exterminatedMines)
+
+  // never display negative
+  return minesLeft
+}
+
+function removeMines(count) {
+  const minePoss = []
+  for (var i = 0; i < gBoard.length; i++) {
+    for (var j = 0; j < gBoard[0].length; j++) {
+      const cell = gBoard[i][j]
+      if (cell.isMine && !cell.isExterminated && !cell.isMarked) {
+        minePoss.push({ i, j })
+      }
+    }
+  }
+
+  const maxRemovable = Math.min(count, minePoss.length)
+
+  for (var idx = 0; idx < maxRemovable; idx++) {
+    const randIdx = getRandomIntInclusive(0, minePoss.length - 1)
+
+    const { i, j } = minePoss.splice(randIdx, 1)[0] // remove from array
+
+    const cell = gBoard[i][j]
+    cell.isMine = false
+    cell.isExterminated = true
+    cell.isShown = true
+  }
+}
+
+function countExterminatedMines() {
+  let exterminatedMines = 0
+  for (let i = 0; i < gBoard.length; i++) {
+    for (let j = 0; j < gBoard[0].length; j++) {
+      const cell = gBoard[i][j]
+      if (cell.isExterminated) exterminatedMines++
+    }
+  }
+  return exterminatedMines
+}

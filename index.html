@@ -11,13 +11,17 @@
     />
     <title>Dor's Mines Sweeper</title>
   </head>
+
   <body onload="onInit()">
-    <header class="header">
+    <header class="header flex-row">
       <h1>Dor's Mines Sweeper</h1>
+      <button class="btn btn-theme-toggle" onclick="onToggleTheme(this)">
+        Dark Mode
+      </button>
     </header>
 
     <main class="main">
-      <div class="stats">
+      <div class="stats flex-row">
         <div class="display mines-count">
           <h3>Mines left:</h3>
           <h3><span></span></h3>
@@ -27,7 +31,7 @@
           <h3>Timer:</h3>
           <h3><span></span></h3>
         </div>
-        <div class="display lives">
+        <div class="display lives flex-row">
           <h3>Lives left:</h3>
           <h3><span>0</span></h3>
         </div>
@@ -38,7 +42,7 @@
       </div>
 
       <div class="buttons-list">
-        <div class="difficulty">
+        <div class="difficulty flex-row">
           <h3>Set difficulty:</h3>
           <button
             class="btn btn-difficulty highlight"
@@ -68,13 +72,25 @@
         <button class="btn btn-mega-hint" onclick="onMegaHintClick()">
           Mega Hint
         </button>
-
         <button class="btn btn-scoreboard" onclick="onOpenScoreBoard()">
           Scoreboard
         </button>
+        <button class="btn btn-exterminator" onclick="onExterminatorClick()">
+          Exterminator
+        </button>
+      </div>
+
+      <div class="additional-features flex-row">
         <div class="display hints">
           <h3>Hints left:</h3>
           <h3><span onclick="onHintClick()">0</span></h3>
+        </div>
+
+        <div class="display safe-clicks">
+          <h4>Safe-Clicks Left: <span class="safe-click-counter"></span></h4>
+          <button class="btn btn-safe-click" onclick="onSafeClick()">
+            Safe Click
+          </button>
         </div>
       </div>
     </main>

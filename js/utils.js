@@ -2,6 +2,28 @@
 
 'use strict'
 
+function onToggleTheme(elThemeBtn) {
+  document.body.classList.toggle('dark-mode')
+  elThemeBtn.innerText =
+    'Dark Mode' === elThemeBtn.innerText ? 'Light Mode' : 'Dark Mode'
+}
+
+const counterPrint = (counter) => {
+  counter++
+  console.log('counter', counter)
+  console.log('gGame.isOn', gGame.isOn)
+  console.log('gGame.shownCount', gGame.shownCount)
+  console.log('gGame.markedCount', gGame.markedCount)
+  console.log('gGame.secsPassed', gGame.secsPassed)
+  console.log('gGame.isFirstMove', gGame.isFirstMove)
+  console.log('gGame.livesCount', gGame.livesCount)
+  console.log('gGame.hintsCount', gGame.hintsCount)
+  console.log('gGame.isHintOn', gGame.isHintOn)
+  console.log('gGame.megaHintsCount', gGame.megaHintsCount)
+  console.log('gGame.isMegaHintOn', gGame.isMegaHintOn)
+  console.log('gGame.isOnce', gGame.isOnce)
+}
+
 function createEmptyBoard() {
   const board = []
   for (var i = 0; i < gLevel.SIZE; i++) {

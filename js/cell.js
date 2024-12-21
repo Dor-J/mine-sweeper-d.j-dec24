@@ -9,6 +9,7 @@ function createCell(i, j) {
     isMarked: false,
     location: { i, j },
     prevCellIcon: null,
+    isExterminated: false,
   }
   return cell
 }
@@ -21,7 +22,11 @@ function showCell(elCell, i, j) {
   elCell.classList.add('shown')
 
   cell.isShown = true
-  gGame.shownCount++
+
+  // increment shownCount only if it's not a mine
+  if (!cell.isMine) {
+    gGame.shownCount++
+  }
 }
 
 function renderCell(currCell, currElCell, i, j) {
@@ -43,6 +48,9 @@ function renderCell(currCell, currElCell, i, j) {
   if (currCell.isMarked) {
     classes.push('marked')
     currIcon = gIcons.flag
+  }
+  if (currCell.isExterminated) {
+    currIcon = gIcons.exterminated
   }
 
   if (!currElCell) {

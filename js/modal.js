@@ -2,7 +2,7 @@
 
 function renderVictoryModal() {
   const elModalTitle = document.querySelector('.modal-title')
-  elModalTitle.innerText = 'You Win!'
+  elModalTitle.innerText = 'You Win! 🎉🎉🎉'
   openModal()
 }
 
@@ -22,6 +22,6 @@ function closeModal() {
 
 function renderLoseModal() {
   const elModalTitle = document.querySelector('.modal-title')
-  elModalTitle.innerText = 'You Lose!'
+  elModalTitle.innerText = 'You Lose! 💀'
   openModal()
 }

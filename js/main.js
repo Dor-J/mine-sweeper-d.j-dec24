@@ -15,7 +15,6 @@ const gGame = {
   isOn: false,
   shownCount: 0,
   markedCount: 0,
-  minesLeft: 0,
   secsPassed: 0,
   secInterval: 0,
   elSelectedCell: null,
@@ -26,6 +25,8 @@ const gGame = {
   isHintOn: false,
   isMegaHintOn: false,
   isOnce: false,
+  safeClicks: 0,
+  hasExterminatorUsed: false,
 }
 
 const gIcons = {
@@ -48,6 +49,8 @@ const gIcons = {
   mark: '😉',
   life: '🧡', //💻
   hint: '💡',
+  exterminated: '✘',
+  exterminate: '🤖',
 }
 
 function onInit() {
@@ -65,7 +68,6 @@ function setupGame() {
   //  gGame reset
   gGame.isOn = false
   gGame.shownCount = 0
-  gGame.minesLeft = gLevel.MINES
   gGame.markedCount = 0
   gGame.secsPassed = 0
   gGame.secInterval = 0
@@ -76,6 +78,8 @@ function setupGame() {
   gGame.megaHintsCount = 1
   gGame.isHintOn = false
   gGame.isMegaHintOn = false
+  gGame.safeClicks = 3
+  gGame.hasExterminatorUsed = false
 
   if (!gGame.isOnce) {
     getScoresFromStorage()
@@ -94,32 +98,42 @@ function buildBoard() {
 }
 
 function renderBoard(board) {
+  var classes = []
   var strHTML = '<table><tbody>'
   for (var i = 0; i < board.length; i++) {
     strHTML += '<tr>'
     for (var j = 0; j < board[0].length; j++) {
       const cell = board[i][j]
-      const dataLocation = { i, j }
+
       var currIcon = gIcons.empty
-      var classes = ''
+      classes = []
 
       if (cell.isMine && !cell.isMarked) {
-        classes += ' mine'
+        classes.push('mine')
         currIcon = gIcons.mine
       } else if (cell.minesAroundCount > 0) {
         currIcon = gIcons[`num${cell.minesAroundCount}`]
       }
       if (!cell.isShown) {
-        classes += ' not-shown'
+        classes.push('not-shown')
       } else {
-        classes += ' shown'
+        classes.push('shown')
       }
       if (cell.isMarked) {
-        classes += ' marked'
+        classes.push('marked')
         currIcon = gIcons.flag
       }
+      if (cell.isExterminated) {
+        currIcon = gIcons.exterminated
+      }
+      const strClasses = classes.join(' ')
 
-      strHTML += `<td class="cell${classes}" data-i=${dataLocation.i} data-j=${dataLocation.j} onmousedown="onCellClicked(this, ${dataLocation.i}, ${dataLocation.j},event)">${currIcon}</td>`
+      strHTML += `<td class="cell ${strClasses}" 
+                  data-i=${i} data-j=${j} 
+                  onmousedown="onCellClicked(this, ${i},
+                   ${j}, event)">
+                    ${currIcon}
+                  </td>`
     }
     strHTML += '</tr>'
   }
@@ -147,7 +161,6 @@ function onCellClicked(elCell, i, j, event) {
     showHintClick(cell, elCell, i, j)
     return
   }
-
   if (gGame.isMegaHintOn) {
     handleMegaHintSelection(i, j)
     return
@@ -186,6 +199,7 @@ function onCellClicked(elCell, i, j, event) {
   }
 
   if (!gGame.isFirstMove) gGame.isFirstMove = true
+  updateMinesCounter()
   checkGameOver()
 }
 
@@ -203,7 +217,7 @@ function cellIsMine(cell, elCell, i, j) {
     renderBoard(gBoard)
 
     gGame.isFirstMove = true
-    showCell(elCell, i, j)
+    // showCell(elCell, i, j)
   } else {
     showCell(elCell, i, j)
 
@@ -227,13 +241,16 @@ function onCellMarked(elCell) {
   var currCell = gBoard[cuurI][cuurJ]
 
   if (currCell.isMarked) {
+    // if currently flagged -> unflag
     currCell.isMarked = false
     gGame.markedCount--
 
     elCell.classList.remove('marked')
+
     elCell.innerText = currCell.prevCellIcon
       ? currCell.prevCellIcon
       : gIcons.empty
+
     currCell.prevCellIcon = null
   } else {
     currCell.isMarked = true
@@ -244,6 +261,7 @@ function onCellMarked(elCell) {
     elCell.classList.add('marked')
     elCell.innerText = gIcons.flag
   }
+
   updateMinesCounter()
   checkGameOver()
 }
@@ -278,10 +296,16 @@ function expandShown(board, elCell, i, j) {
 function checkGameOver() {
   // Game ends when all mines are marked, and all the other cells are shown
   const totalCells = gLevel.SIZE ** 2
+  const totalMines = gLevel.MINES
+  const exterminatedMines = countExterminatedMines()
+  const revealedMines = countShownMines()
   const markedMines = countMarkedMines()
-  const nonMineCellsShown = gGame.shownCount === totalCells - gLevel.MINES
 
-  if (markedMines === gLevel.MINES && nonMineCellsShown) {
+  const nonMineCellsShown = gGame.shownCount === totalCells - totalMines
+  const allMinesAccounted =
+    totalMines === revealedMines + markedMines + exterminatedMines
+
+  if (allMinesAccounted && nonMineCellsShown) {
     gGame.isOn = false
     stopTimer()
     updateEmoji('victory')
@@ -291,19 +315,6 @@ function checkGameOver() {
     setTimeout(closeModal, 5000)
     return
   }
-}
-
-function countMarkedMines() {
-  var correctlyMarkedMines = 0
-  for (var i = 0; i < gBoard.length; i++) {
-    for (var j = 0; j < gBoard[i].length; j++) {
-      const cell = gBoard[i][j]
-      if (cell.isMarked && cell.isMine) {
-        correctlyMarkedMines++
-      }
-    }
-  }
-  return correctlyMarkedMines
 }
 
 function gameOver() {
@@ -336,4 +347,51 @@ function highlightDifficultyBtn(newDifBtn) {
   currDifBtn.classList.remove('highlight')
 
   newDifBtn.classList.add('highlight')
+}
+
+function onSafeClick() {
+  if (!gGame.isOn) return // game off
+  if (gGame.safeClicks <= 0) return //no safe clicks abort
+
+  const safeCells = []
+  for (var i = 0; i < gBoard.length; i++) {
+    for (var j = 0; j < gBoard[0].length; j++) {
+      const cell = gBoard[i][j]
+
+      if (!cell.isMine && !cell.isShown && !cell.isMarked) {
+        safeCells.push({ i, j })
+      }
+    }
+  }
+
+  if (!safeCells.length) return // no safe cells
+
+  const randIdx = getRandomIntInclusive(0, safeCells.length - 1)
+
+  const chosenPos = safeCells[randIdx]
+  const elChosenCell = document.querySelector(
+    `.cell[data-i="${chosenPos.i}"][data-j="${chosenPos.j}"]`
+  )
+
+  elChosenCell.classList.add('safe')
+  setTimeout(() => {
+    elChosenCell.classList.remove('safe')
+  }, 3000)
+
+  gGame.safeClicks--
+  updateSafeClickCounter()
+}
+
+function onExterminatorClick() {
+  if (gGame.hasExterminatorUsed) return
+  gGame.hasExterminatorUsed = true
+
+  removeMines(3)
+
+  setMinesNegsCount(gBoard)
+  renderBoard(gBoard)
+  updateMinesCounter()
+
+  playSound('exterminate')
+  updateEmoji('exterminate')
 }

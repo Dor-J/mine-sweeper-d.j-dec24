@@ -25,6 +25,7 @@
   --color-cell-revealed: #ffffff;
   --color-cell-flagged: yellow;
   --color-cell-flagged-txt: white;
+  --cell-border-clr: #333;
 
   /* shadows */
   --highlight-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.7);
@@ -33,6 +34,7 @@
   --cell-size: 4rem;
   --modal-width: 250px;
   --modal-height: 250px;
+  --scoreboard-min-width: 350px;
 
   /* border radius */
   --modal-border-radius: 20%;
@@ -62,6 +64,13 @@ body {
 .highlight {
   box-shadow: var(--highlight-shadow);
   border: 2px solid white;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Header Footer */
@@ -95,18 +104,14 @@ footer {
 
 /* Stats */
 .stats {
-  display: flex;
-  flex-direction: row;
   gap: 1.8rem;
-  justify-content: center;
-  align-items: center;
   margin: 1rem, auto;
 }
 
 .display {
   min-height: 2rem;
   /* border: 1px solid black; */
-  margin: 1rem 0.5rem;
+  margin: 0.8rem 0.5rem;
   padding: 1rem;
   font-size: 1.3rem;
 }
@@ -124,17 +129,11 @@ footer {
 }
 
 .lives {
-  display: flex;
-  flex-direction: column;
   gap: 0.1rem;
 }
 
 .difficulty {
-  display: flex;
-  flex-direction: row;
   gap: 1rem;
-  justify-content: center;
-  align-items: center;
   margin: 0.5rem;
 }
 
@@ -158,7 +157,7 @@ td {
   text-align: center;
   vertical-align: middle;
   font-size: 20px;
-  border: 1px solid #333;
+  border: 1px solid var(--cell-border-clr);
 }
 
 /* Cell */
@@ -169,7 +168,7 @@ td {
   background-color: var(--color-cell-bg);
   cursor: pointer;
   padding: auto;
-  transition: background-color 0.4s ease-in, color 0.4s ease;
+  transition: background-color 0.4s ease-in, color 1ms ease;
 
   user-select: none;
 }
@@ -189,7 +188,7 @@ td {
 */
 
 .shown {
-  background-color: white;
+  background-color: var(--color-cell-flagged-txt);
   cursor: not-allowed;
 }
 
@@ -199,8 +198,14 @@ td {
 }
 
 .marked {
-  background-color: yellow;
+  background-color: var(--color-cell-flagged-txt);
   color: white;
+}
+
+.safe {
+  box-shadow: 0 0 10px 2px var(--color-btn-bg);
+  opacity: 0.75;
+  border: 2px solid var(--color-btn-bg);
 }
 
 /* Button */
@@ -224,6 +229,21 @@ td {
   cursor: pointer;
 }
 
+.btn.btn-safe-click {
+  margin-block-start: 0.4rem;
+  padding: 0.8rem 1rem;
+}
+
+.btn.btn-theme-toggle {
+  background-color: var(--color-btn-bg);
+  border: 1px solid var(--color-bg-primary);
+  color: black;
+}
+.btn.btn-theme-toggle:hover {
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-cell-bg);
+}
+
 /* Modal */
 .modal {
   /* use fixed to position relative to the viewport */
@@ -234,7 +254,7 @@ td {
   transform: translate(-50%, -50%);
   background-color: var(--color-cell-bg);
   color: var(--color-cell-flagged-txt);
-  min-width: var(--modal-width) x;
+  min-width: var(--modal-width);
   min-height: var(--modal-height);
   /* above other elements */
   z-index: 1000;
@@ -267,4 +287,39 @@ td {
   flex-direction: column;
   gap: 0.5rem;
   margin: 2rem 3rem;
+  min-width: min(var(--scoreboard-min-width), 70%);
+}
+.scoreboard h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.scoreboard ol {
+  line-height: 1.6;
+  margin: 0.5rem auto;
+}
+
+/* dark-mode override!!! */
+body.dark-mode {
+  --color-bg-primary: #121212;
+  --color-bg-secondary: #282828;
+  --color-txt-primary: #ffffff;
+  --color-btn-bg: #333333;
+  --color-btn-txt: #ffffff;
+  --clr-secondary: #bb86fc;
+  --btn-clr-pimary: #cf55f2;
+  --color-cell-bg: #33305b;
+  --color-cell-hover: #36317a;
+  --color-cell-revealed: #3a3a3a;
+  --color-cell-flagged: #7255a4;
+  --color-cell-flagged-txt: #ffffff;
+  --modal-overlay: rgba(0, 0, 0, 0.8);
+  --cell-border-clr: #a557bb;
+
+  color: var(--color-txt-primary);
+
+  .btn.btn-theme-toggle {
+    background-color: var(--color-btn-bg);
+    border: 1px solid var(--color-cell-flagged-txt);
+    color: var(--color-cell-flagged-txt);
+  }
 }
